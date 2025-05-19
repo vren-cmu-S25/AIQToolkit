@@ -1,0 +1,11 @@
+query,expected_answer
+"What was our company's profitability trend over the last 4 quarters?","Profitability analysis over 4 quarters"
+"How has our debt-to-equity ratio changed over the past 2 years?","Debt-to-equity ratio analysis"
+"What is our current liquidity position and how does it compare to industry benchmarks?","Liquidity position analysis"
+"Which business units have shown the highest efficiency improvements year-over-year?","Efficiency improvement analysis"
+"What are the growth projections for our core product lines in the next fiscal year?","Growth projections analysis"
+"Can you analyze the correlation between our R&D investment and revenue growth over the past 5 years?","R&D and revenue correlation analysis"
+"What impact has our recent cost-cutting initiative had on our operating margins?","Operating margin impact analysis"
+"How has our working capital management efficiency changed since implementing the new ERP system?","Working capital management analysis"
+"What are the main factors contributing to the changes in our EBITDA margins over the past year?","EBITDA margin factor analysis"
+"What is our current return on invested capital and how does it compare to our weighted average cost of capital?","ROIC vs WACC analysis" 

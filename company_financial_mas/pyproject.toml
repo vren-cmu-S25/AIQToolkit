@@ -1,34 +1,58 @@
 [build-system]
-requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools >= 64", "setuptools-scm>=8"]
+
+[tool.setuptools_scm]
+root = "../"
 
 [project]
-name = "aiq_financial_mas"
+name = "aiq_company_financial_mas"
 version = "0.1.0"
 authors = [
-    { name = "Your Name", email = "your.email@example.com" },
+    {name = "Vincent Ren", email = "vren@andrew.cmu.edu"},
 ]
-description = "A financial multi-agent system for company financial analysis using NVIDIA AIQ"
-requires-python = ">=3.8"
-dependencies = [
-    "aiq",
-    "pandas",
-    "numpy",
-    "pydantic",
-    "python-dotenv",
-    "sqlalchemy",
-    "networkx",
-    "matplotlib",
-    "seaborn",
-    "pinecone-client",
-    "motor",
-    "asyncpg",
-    "tenacity",
-    "pyyaml",
-    "python-jose[cryptography]",
-    "passlib[bcrypt]",
-    "python-multipart",
+description = "Company Financial Multi-Agent System using AIQ toolkit"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
 ]
 
-[tool.setuptools]
-packages = ["aiq_financial_mas"] 
+dependencies = [
+    "aiqtoolkit[langchain]",
+    "langchain",
+    "langchain-core",
+    "langgraph>=0.0.10",
+    "pydantic",
+    "pandas>=2.0.0",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "plotly",
+    "python-dotenv",
+    "flask>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pylint",
+    "black",
+    "mypy",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.uv.sources]
+aiqtoolkit = { path = "..", editable = true }
+
+[project.entry-points."aiq.components"]
+company_financial_mas = "company_financial_mas.register"
+profitability_analysis = "company_financial_mas.profitability_analysis" 

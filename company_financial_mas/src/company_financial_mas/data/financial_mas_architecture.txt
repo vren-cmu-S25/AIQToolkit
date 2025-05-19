@@ -1,0 +1,53 @@
+User Query
+    │
+    ▼
+┌───────────────────────┐
+│ Financial Controller  │  <- Orchestrates overall process
+│ Agent (Main LLM)      │     Manages conversation context
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ Query Understanding & │  <- Classifies query type
+│ Planning Agent        │     Generates execution plan
+└───────────┬───────────┘
+            │
+            ├───────────────────┬────────────────┬────────────────┬────────────────┐
+            ▼                   ▼                ▼                ▼                ▼
+┌───────────────────┐  ┌──────────────────┐  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐
+│ Profitability     │  │ Liquidity        │  │ Efficiency   │  │ Risk &       │  │ Growth        │
+│ Analysis Agent    │  │ Analysis Agent   │  │ Analysis     │  │ Leverage     │  │ Analysis      │
+└────────┬──────────┘  └────────┬─────────┘  │ Agent        │  │ Agent        │  │ Agent         │
+         │                      │            └───────┬──────┘  └───────┬──────┘  └───────┬───────┘
+         │                      │                    │                 │                 │
+         └──────────────────────┴────────────────────┴─────────────────┴─────────────────┘
+                                                     │
+                                                     ▼
+                                        ┌───────────────────────┐
+                                        │ Memory & Database     │
+                                        │ Interaction Agent     │
+                                        └───────────┬───────────┘
+                                                    │
+                                                    ├─────────────────┬──────────────┬───────────────┐
+                                                    ▼                 ▼              ▼               ▼
+                                           ┌─────────────────┐ ┌─────────────┐ ┌───────────┐ ┌────────────────┐
+                                           │ Vector Database │ │ Time-Series │ │ Document  │ │ Knowledge      │
+                                           │ (Conversations, │ │ Database    │ │ Database  │ │ Graph          │
+                                           │  Embeddings)    │ │ (Metrics)   │ │ (Reports) │ │ (Relations)    │
+                                           └─────────────────┘ └─────────────┘ └───────────┘ └────────────────┘
+                                                    │
+                                                    │
+                                                    ▼
+                                           ┌──────────────────────┐
+                                           │ Insight Aggregation  │  <- Compiles & synthesizes findings
+                                           │ & Visualization Agent│     Handles cross-metric analysis
+                                           └──────────┬───────────┘
+                                                      │
+                                                      ▼
+                                           ┌──────────────────────┐
+                                           │ Response Generation  │  <- Formats final answer
+                                           │ Agent                │     Generates visualizations
+                                           └──────────┬───────────┘
+                                                      │
+                                                      ▼
+                                                Final Answer 
