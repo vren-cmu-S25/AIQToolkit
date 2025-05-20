@@ -1,0 +1,344 @@
+{
+  "profitability_analysis": [
+    {
+      "query_pattern": "profitability trend",
+      "data": {
+        "profitability_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "revenue": [10000000, 10500000, 11200000, 12000000, 12800000],
+          "cogs": [6000000, 6200000, 6500000, 6800000, 7200000],
+          "gross_profit": [4000000, 4300000, 4700000, 5200000, 5600000],
+          "operating_expenses": [3000000, 3100000, 3300000, 3400000, 3500000],
+          "operating_income": [1000000, 1200000, 1400000, 1800000, 2100000],
+          "net_income": [750000, 900000, 1050000, 1350000, 1575000],
+          "gross_margin": [40.0, 41.0, 42.0, 43.3, 43.8],
+          "operating_margin": [10.0, 11.4, 12.5, 15.0, 16.4],
+          "net_margin": [7.5, 8.6, 9.4, 11.3, 12.3]
+        },
+        "metrics": {
+          "latest_revenue": 12800000,
+          "latest_net_income": 1575000,
+          "latest_gross_margin": 43.8,
+          "latest_operating_margin": 16.4,
+          "latest_net_margin": 12.3,
+          "revenue_growth_rate": 28.0,
+          "net_income_growth_rate": 110.0
+        },
+        "industry_benchmarks": {
+          "avg_gross_margin": 38.5,
+          "avg_operating_margin": 12.0,
+          "avg_net_margin": 8.5,
+          "avg_revenue_growth": 15.0,
+          "top_quartile_gross_margin": 45.0,
+          "top_quartile_operating_margin": 18.0,
+          "top_quartile_net_margin": 14.0
+        }
+      }
+    },
+    {
+      "query_pattern": "margin trend",
+      "data": {
+        "profitability_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "gross_margin": [40.0, 41.0, 42.0, 43.3, 43.8],
+          "operating_margin": [10.0, 11.4, 12.5, 15.0, 16.4],
+          "net_margin": [7.5, 8.6, 9.4, 11.3, 12.3],
+          "ebitda_margin": [15.0, 16.2, 17.5, 19.8, 21.0]
+        },
+        "metrics": {
+          "latest_gross_margin": 43.8,
+          "latest_operating_margin": 16.4,
+          "latest_net_margin": 12.3,
+          "latest_ebitda_margin": 21.0,
+          "gross_margin_change": 3.8,
+          "operating_margin_change": 6.4,
+          "net_margin_change": 4.8,
+          "ebitda_margin_change": 6.0
+        },
+        "industry_benchmarks": {
+          "avg_gross_margin": 38.5,
+          "avg_operating_margin": 12.0,
+          "avg_net_margin": 8.5,
+          "avg_ebitda_margin": 18.0,
+          "peer_companies": [
+            {
+              "name": "Competitor A",
+              "gross_margin": 42.5,
+              "operating_margin": 14.8,
+              "net_margin": 11.2,
+              "ebitda_margin": 19.5
+            },
+            {
+              "name": "Competitor B",
+              "gross_margin": 39.2,
+              "operating_margin": 11.0,
+              "net_margin": 7.8,
+              "ebitda_margin": 16.3
+            },
+            {
+              "name": "Competitor C",
+              "gross_margin": 45.0,
+              "operating_margin": 17.2,
+              "net_margin": 13.5,
+              "ebitda_margin": 22.1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "query_pattern": "earnings",
+      "data": {
+        "profitability_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "operating_income": [1000000, 1200000, 1400000, 1800000, 2100000],
+          "ebitda": [1500000, 1700000, 1960000, 2376000, 2688000],
+          "ebt": [900000, 1080000, 1260000, 1620000, 1890000],
+          "net_income": [750000, 900000, 1050000, 1350000, 1575000],
+          "eps": [0.75, 0.90, 1.05, 1.35, 1.58]
+        },
+        "metrics": {
+          "latest_operating_income": 2100000,
+          "latest_ebitda": 2688000,
+          "latest_ebt": 1890000,
+          "latest_net_income": 1575000,
+          "latest_eps": 1.58,
+          "operating_income_growth": 110.0,
+          "ebitda_growth": 79.2,
+          "net_income_growth": 110.0,
+          "eps_growth": 110.67
+        },
+        "analyst_estimates": {
+          "expected_eps": 1.52,
+          "earnings_surprise": 3.95,
+          "consensus_rating": "Buy",
+          "price_target": 78.50,
+          "forward_pe": 18.3
+        }
+      }
+    },
+    {
+      "query_pattern": "segment profitability",
+      "data": {
+        "profitability_data": {
+          "segments": ["Product A", "Product B", "Product C", "Services"],
+          "revenue": [5500000, 3200000, 2100000, 2000000],
+          "gross_profit": [2750000, 1280000, 735000, 835000],
+          "operating_income": [1100000, 512000, 189000, 300000],
+          "gross_margin": [50.0, 40.0, 35.0, 41.8],
+          "operating_margin": [20.0, 16.0, 9.0, 15.0],
+          "revenue_growth": [15.0, 8.5, 25.0, 35.0],
+          "contribution": [42.9, 25.0, 16.4, 15.6]
+        },
+        "historical_segment_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "Product A": {
+            "revenue": [4800000, 5000000, 5200000, 5350000, 5500000],
+            "gross_margin": [48.0, 48.5, 49.0, 49.5, 50.0],
+            "operating_margin": [18.0, 18.5, 19.0, 19.5, 20.0]
+          },
+          "Product B": {
+            "revenue": [2950000, 3000000, 3050000, 3100000, 3200000],
+            "gross_margin": [38.5, 39.0, 39.5, 39.8, 40.0],
+            "operating_margin": [14.5, 15.0, 15.5, 15.8, 16.0]
+          },
+          "Product C": {
+            "revenue": [1680000, 1750000, 1850000, 1950000, 2100000],
+            "gross_margin": [32.0, 33.0, 34.0, 34.5, 35.0],
+            "operating_margin": [7.0, 7.5, 8.0, 8.5, 9.0]
+          },
+          "Services": {
+            "revenue": [1480000, 1580000, 1700000, 1820000, 2000000],
+            "gross_margin": [38.0, 39.0, 40.0, 41.0, 41.8],
+            "operating_margin": [12.0, 13.0, 14.0, 14.5, 15.0]
+          }
+        }
+      }
+    },
+    {
+      "query_pattern": "ROI",
+      "data": {
+        "profitability_data": {
+          "time_periods": ["2020", "2021", "2022", "2023", "Q1 2024 (Annualized)"],
+          "net_income": [2400000, 2600000, 2900000, 4050000, 6300000],
+          "total_assets": [45000000, 48000000, 50000000, 52000000, 54000000],
+          "shareholders_equity": [28000000, 30000000, 32000000, 35000000, 37000000],
+          "invested_capital": [35000000, 37000000, 39000000, 41000000, 43000000],
+          "roa": [5.33, 5.42, 5.80, 7.79, 11.67],
+          "roe": [8.57, 8.67, 9.06, 11.57, 17.03],
+          "roic": [6.86, 7.03, 7.44, 9.88, 14.65]
+        },
+        "metrics": {
+          "latest_roa": 11.67,
+          "latest_roe": 17.03,
+          "latest_roic": 14.65,
+          "roa_change_vs_prior_year": 3.88,
+          "roe_change_vs_prior_year": 5.46,
+          "roic_change_vs_prior_year": 4.77
+        },
+        "industry_benchmarks": {
+          "avg_roa": 6.2,
+          "avg_roe": 12.8,
+          "avg_roic": 8.5,
+          "top_quartile_roa": 9.5,
+          "top_quartile_roe": 16.0,
+          "top_quartile_roic": 12.0
+        },
+        "capital_allocation": {
+          "categories": ["R&D", "Capex", "M&A", "Share Repurchases", "Dividends"],
+          "allocation_percentage": [15, 25, 20, 15, 25],
+          "roic_by_category": [18.5, 12.2, 10.8, 9.5, 8.7]
+        }
+      }
+    },
+    {
+      "query_pattern": "cost structure",
+      "data": {
+        "profitability_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "revenue": [10000000, 10500000, 11200000, 12000000, 12800000],
+          "cogs_breakdown": {
+            "materials": [3600000, 3720000, 3900000, 4080000, 4320000],
+            "labor": [1500000, 1550000, 1625000, 1700000, 1800000],
+            "overhead": [900000, 930000, 975000, 1020000, 1080000]
+          },
+          "opex_breakdown": {
+            "sales_marketing": [1200000, 1240000, 1320000, 1360000, 1400000],
+            "r_and_d": [900000, 930000, 990000, 1020000, 1050000],
+            "g_and_a": [900000, 930000, 990000, 1020000, 1050000]
+          },
+          "fixed_vs_variable": {
+            "fixed_costs": [2700000, 2790000, 2970000, 3060000, 3150000],
+            "variable_costs": [6300000, 6510000, 6830000, 7140000, 7550000]
+          }
+        },
+        "cost_ratios": {
+          "cogs_to_revenue": [60.0, 59.0, 58.0, 56.7, 56.3],
+          "materials_to_revenue": [36.0, 35.4, 34.8, 34.0, 33.8],
+          "labor_to_revenue": [15.0, 14.8, 14.5, 14.2, 14.1],
+          "overhead_to_revenue": [9.0, 8.9, 8.7, 8.5, 8.4],
+          "sales_marketing_to_revenue": [12.0, 11.8, 11.8, 11.3, 10.9],
+          "r_and_d_to_revenue": [9.0, 8.9, 8.8, 8.5, 8.2],
+          "g_and_a_to_revenue": [9.0, 8.9, 8.8, 8.5, 8.2],
+          "fixed_cost_percentage": [30.0, 30.0, 30.3, 30.0, 29.4],
+          "variable_cost_percentage": [70.0, 70.0, 69.7, 70.0, 70.6]
+        },
+        "efficiency_metrics": {
+          "operational_leverage": 1.8,
+          "breakeven_point": 7500000,
+          "contribution_margin": 41.0
+        }
+      }
+    },
+    {
+      "query_pattern": "geographical profitability",
+      "data": {
+        "profitability_data": {
+          "regions": ["North America", "Europe", "Asia Pacific", "Latin America"],
+          "revenue": [6400000, 3200000, 2500000, 700000],
+          "gross_profit": [2880000, 1344000, 1125000, 252000],
+          "operating_income": [1344000, 512000, 400000, 91000],
+          "gross_margin": [45.0, 42.0, 45.0, 36.0],
+          "operating_margin": [21.0, 16.0, 16.0, 13.0],
+          "revenue_growth": [12.0, 18.0, 35.0, 25.0],
+          "contribution": [50.0, 25.0, 19.5, 5.5]
+        },
+        "historical_region_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "North America": {
+            "revenue": [5700000, 5900000, 6100000, 6250000, 6400000],
+            "gross_margin": [43.0, 43.5, 44.0, 44.5, 45.0],
+            "operating_margin": [19.0, 19.5, 20.0, 20.5, 21.0]
+          },
+          "Europe": {
+            "revenue": [2700000, 2800000, 2950000, 3100000, 3200000],
+            "gross_margin": [40.0, 40.5, 41.0, 41.5, 42.0],
+            "operating_margin": [14.0, 14.5, 15.0, 15.5, 16.0]
+          },
+          "Asia Pacific": {
+            "revenue": [1850000, 2000000, 2150000, 2300000, 2500000],
+            "gross_margin": [42.0, 43.0, 43.5, 44.0, 45.0],
+            "operating_margin": [13.0, 14.0, 14.5, 15.0, 16.0]
+          },
+          "Latin America": {
+            "revenue": [560000, 600000, 640000, 670000, 700000],
+            "gross_margin": [33.0, 34.0, 34.5, 35.0, 36.0],
+            "operating_margin": [10.0, 11.0, 11.5, 12.5, 13.0]
+          }
+        },
+        "market_maturity": {
+          "North America": "Mature",
+          "Europe": "Established",
+          "Asia Pacific": "Growth",
+          "Latin America": "Emerging"
+        }
+      }
+    },
+    {
+      "query_pattern": "EBITDA",
+      "data": {
+        "profitability_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "revenue": [10000000, 10500000, 11200000, 12000000, 12800000],
+          "operating_income": [1000000, 1200000, 1400000, 1800000, 2100000],
+          "depreciation": [350000, 350000, 360000, 360000, 370000],
+          "amortization": [150000, 150000, 200000, 216000, 218000],
+          "ebitda": [1500000, 1700000, 1960000, 2376000, 2688000],
+          "ebitda_margin": [15.0, 16.2, 17.5, 19.8, 21.0],
+          "adjusted_ebitda": [1600000, 1800000, 2060000, 2450000, 2750000],
+          "adjusted_ebitda_margin": [16.0, 17.1, 18.4, 20.4, 21.5]
+        },
+        "metrics": {
+          "latest_ebitda": 2688000,
+          "latest_ebitda_margin": 21.0,
+          "latest_adjusted_ebitda": 2750000,
+          "latest_adjusted_ebitda_margin": 21.5,
+          "ebitda_growth_rate": 79.2,
+          "ebitda_cagr_3yr": 21.5
+        },
+        "industry_benchmarks": {
+          "avg_ebitda_margin": 16.5,
+          "top_quartile_ebitda_margin": 22.0,
+          "avg_ebitda_growth": 12.0,
+          "enterprise_value_to_ebitda": 10.5
+        },
+        "adjustments": {
+          "one_time_expenses": 35000,
+          "stock_compensation": 22000,
+          "restructuring_costs": 5000
+        }
+      }
+    },
+    {
+      "query_pattern": "cash profitability",
+      "data": {
+        "profitability_data": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "revenue": [10000000, 10500000, 11200000, 12000000, 12800000],
+          "net_income": [750000, 900000, 1050000, 1350000, 1575000],
+          "operating_cash_flow": [900000, 1050000, 1200000, 1500000, 1700000],
+          "free_cash_flow": [600000, 720000, 850000, 1100000, 1300000],
+          "cash_conversion_ratio": [1.20, 1.17, 1.14, 1.11, 1.08],
+          "fcf_to_revenue": [6.0, 6.9, 7.6, 9.2, 10.2],
+          "fcf_to_net_income": [80.0, 80.0, 81.0, 81.5, 82.5]
+        },
+        "metrics": {
+          "latest_ocf": 1700000,
+          "latest_fcf": 1300000,
+          "ocf_growth_rate": 88.9,
+          "fcf_growth_rate": 116.7,
+          "fcf_to_enterprise_value": 0.045
+        },
+        "cash_flow_components": {
+          "time_periods": ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"],
+          "working_capital_changes": [-50000, -60000, -70000, -80000, -95000],
+          "capital_expenditures": [300000, 330000, 350000, 400000, 400000],
+          "acquisitions": [0, 0, 1500000, 0, 0],
+          "debt_repayment": [200000, 200000, 200000, 200000, 200000],
+          "share_repurchases": [100000, 100000, 150000, 150000, 200000],
+          "dividends": [150000, 150000, 150000, 175000, 175000]
+        }
+      }
+    }
+  ]
+} 

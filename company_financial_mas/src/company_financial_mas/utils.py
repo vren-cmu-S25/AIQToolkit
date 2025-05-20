@@ -107,7 +107,24 @@ def get_fallback_data(tool_name: str, query_params: Dict[str, Any]) -> Dict[str,
     
     # Try to find the tool in the fallback data
     if tool_name in _benign_fallback_data:
-        return _benign_fallback_data[tool_name]
+        tool_data = _benign_fallback_data[tool_name]
+        
+        # If the tool data is a list, it uses the query_pattern matching structure
+        if isinstance(tool_data, list):
+            query = query_params.get("query", "").lower()
+            for pattern_data in tool_data:
+                pattern = pattern_data.get("query_pattern", "").lower()
+                if pattern and pattern in query:
+                    logger.info(f"Found matching pattern '{pattern}' for query: {query}")
+                    return pattern_data.get("data", {})
+            
+            # If no specific pattern matched, return the first entry as default if available
+            if tool_data:
+                logger.info(f"No specific pattern matched for query, using default data")
+                return tool_data[0].get("data", {})
+        else:
+            # If it's not a list, return the data directly
+            return tool_data
     
     logger.warning(f"No fallback data found for tool {tool_name}")
     return {}

@@ -21,6 +21,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 from aiq.builder.builder import Builder
 from aiq.builder.framework_enum import LLMFrameworkEnum
+from aiq.builder.function_info import FunctionInfo
 from aiq.cli.register_workflow import register_function
 from aiq.data_models.component_ref import LLMRef
 from aiq.data_models.function import FunctionBaseConfig
@@ -36,6 +37,12 @@ class ProfitabilityAnalysisConfig(FunctionBaseConfig, name="profitability_analys
     """
     llm_name: LLMRef
     test_mode: bool = Field(default=True, description="Whether to run in test mode")
+    test_data_path: Optional[str] = Field(
+        default=None, 
+        description="Path to the main test dataset in CSV format")
+    benign_fallback_data_path: Optional[str] = Field(
+        default=None, 
+        description="Path to JSON file with baseline/normal system behavior data")
 
 
 @register_function(config_type=ProfitabilityAnalysisConfig, framework_wrappers=[LLMFrameworkEnum.LANGCHAIN])
@@ -50,6 +57,13 @@ async def profitability_analysis_function(config: ProfitabilityAnalysisConfig, b
     Returns:
         Tool function wrapped for AIQ
     """
+    # Preload test data if in test mode
+    if config.test_mode:
+        utils.preload_test_data(
+            test_data_path=config.test_data_path,
+            benign_fallback_data_path=config.benign_fallback_data_path
+        )
+    
     # Get LLM for the profitability analysis agent
     llm: BaseChatModel = await builder.get_llm(config.llm_name, wrapper_type=LLMFrameworkEnum.LANGCHAIN)
 
@@ -64,50 +78,15 @@ async def profitability_analysis_function(config: ProfitabilityAnalysisConfig, b
             Dictionary with profitability analysis results
         """
         if config.test_mode:
-            # In test mode, use mock data
+            # In test mode, use fallback data from JSON file
             mock_data = utils.get_fallback_data("profitability_analysis", query_params)
             if mock_data:
                 return mock_data
             
-            # Generate simple mock data if no specific mock data is available
-            time_periods = ["Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024"]
-            revenue = [10000000, 10500000, 11200000, 12000000, 12800000]
-            cogs = [6000000, 6200000, 6500000, 6800000, 7200000]
-            gross_profit = [r - c for r, c in zip(revenue, cogs)]
-            operating_expenses = [3000000, 3100000, 3300000, 3400000, 3500000]
-            operating_income = [g - o for g, o in zip(gross_profit, operating_expenses)]
-            net_income = [o * 0.75 for o in operating_income]
-            
-            # Calculate margins
-            gross_margin = [g / r * 100 for g, r in zip(gross_profit, revenue)]
-            operating_margin = [o / r * 100 for o, r in zip(operating_income, revenue)]
-            net_margin = [n / r * 100 for n, r in zip(net_income, revenue)]
-            
-            # Create mock profitability data
-            profitability_data = {
-                "time_periods": time_periods,
-                "revenue": revenue,
-                "cogs": cogs,
-                "gross_profit": gross_profit,
-                "operating_expenses": operating_expenses,
-                "operating_income": operating_income,
-                "net_income": net_income,
-                "gross_margin": gross_margin,
-                "operating_margin": operating_margin,
-                "net_margin": net_margin
-            }
-            
+            # If no specific mock data is found, return a default message
+            utils.logger.warning("No matching fallback data found for query in profitability_analysis.json")
             return {
-                "profitability_data": profitability_data,
-                "metrics": {
-                    "latest_revenue": revenue[-1],
-                    "latest_net_income": net_income[-1],
-                    "latest_gross_margin": gross_margin[-1],
-                    "latest_operating_margin": operating_margin[-1],
-                    "latest_net_margin": net_margin[-1],
-                    "revenue_growth_rate": (revenue[-1] - revenue[0]) / revenue[0] * 100,
-                    "net_income_growth_rate": (net_income[-1] - net_income[0]) / net_income[0] * 100
-                }
+                "error": "No matching fallback data found for this query. Please update the fallback data JSON file."
             }
         else:
             # In live mode, retrieve actual profitability data
@@ -171,4 +150,12 @@ async def profitability_analysis_function(config: ProfitabilityAnalysisConfig, b
             utils.logger.error(f"Error in profitability analysis: {e}")
             return f"Error performing profitability analysis: {str(e)}"
 
-    return profitability_analysis_tool 
+    try:
+        # Use FunctionInfo.from_fn to properly wrap the function
+        yield FunctionInfo.from_fn(
+            profitability_analysis_tool, 
+            description="Analyze company profitability metrics such as revenue, costs, margins, and earnings"
+        )
+    finally:
+        # Cleanup code if needed (like closing connections)
+        utils.logger.info("Cleaning up profitability analysis agent resources") 

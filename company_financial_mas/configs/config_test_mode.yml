@@ -16,21 +16,17 @@
 general:
   use_uvloop: true
 
-functions:
-  profitability_analysis:
-    _type: profitability_analysis
-    llm_name: financial_analysis_llm
-    test_mode: true
+# functions:
+#   profitability_analysis:
+#     _type: profitability_analysis
+#     llm_name: financial_analysis_llm
+#     test_mode: true
 
 workflow:
-  _type: tool_calling_agent
+  _type: financial_controller_agent
   tools:
     - profitability_analysis
   llm_name: controller_llm
-  system_message: |
-    You are an advanced financial analysis assistant that helps analyze company financial data.
-    When asked about profitability, use the profitability_analysis tool to provide detailed insights.
-    Always explain financial metrics in a clear, understandable way.
 
 llms:
   controller_llm:
