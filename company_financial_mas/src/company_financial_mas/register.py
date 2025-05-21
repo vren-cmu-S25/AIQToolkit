@@ -11,3 +11,5 @@ This file imports all modules that register functions with AIQ.
 
 # Import any modules which need to be automatically registered here
 from . import profitability_analysis 
+from . import retrieve_data_tool
+from . import update_data_tool

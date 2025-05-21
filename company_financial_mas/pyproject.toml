@@ -32,6 +32,7 @@ dependencies = [
     "seaborn",
     "plotly",
     "python-dotenv",
+    "psycopg2-binary>=2.9.0",
     "flask>=3.0.0",
 ]
 

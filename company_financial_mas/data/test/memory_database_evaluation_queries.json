@@ -1,0 +1,58 @@
+{
+  "queries": [
+    {
+      "query": "What was our revenue for Q1 2024?",
+      "expected_answer": "The revenue for Q1 2024 was $1,550,000, which represents a 3.3% growth rate compared to the previous quarter.",
+      "data_type": "time_series",
+      "test_id": "ts_revenue_q1_2024"
+    },
+    {
+      "query": "How has our gross margin changed over the past year?",
+      "expected_answer": "The gross margin has shown a positive trend from Q1 2023 to Q1 2024, increasing from 42% to 45%. There was a slight dip to 41% in Q3 2023, but it recovered and continued to improve in subsequent quarters.",
+      "data_type": "time_series",
+      "test_id": "ts_margin_trend"
+    },
+    {
+      "query": "What were the key achievements mentioned in our 2023 annual report?",
+      "expected_answer": "The 2023 annual report highlights strong performance with 8% revenue growth and expansion into new markets. Key achievements include launching two new product lines and improving operational efficiency by 5%.",
+      "data_type": "document",
+      "test_id": "doc_annual_achievements"
+    },
+    {
+      "query": "Who are our main competitors and what are their market shares?",
+      "expected_answer": "The main direct competitors are Alpha Innovations with 18% market share and Beta Solutions with 15% market share. There is also an indirect competitor, Gamma Tech, with 8% market share. Our company leads with a 22% market share.",
+      "data_type": "knowledge_graph",
+      "test_id": "kg_competitors"
+    },
+    {
+      "query": "What was our operating cash flow trend for 2023?",
+      "expected_answer": "The operating cash flow showed a mixed but generally positive trend throughout 2023. It started at $300,000 in Q1, increased to $320,000 in Q2, decreased to $290,000 in Q3, and then increased significantly to $350,000 in Q4. By Q1 2024, it further improved to $360,000.",
+      "data_type": "time_series",
+      "test_id": "ts_cash_flow_trend"
+    },
+    {
+      "query": "What are the strengths and weaknesses of our company compared to Alpha Innovations?",
+      "expected_answer": "Our company strengths include customer loyalty, product quality, and an innovation pipeline. Weaknesses include international presence and supply chain complexity. Alpha Innovations' strengths are product innovation and marketing, while their weaknesses are customer service and high costs.",
+      "data_type": "knowledge_graph",
+      "test_id": "kg_competitive_analysis"
+    },
+    {
+      "query": "How did our net profit margin in Q4 2023 compare to Q1 2023?",
+      "expected_answer": "The net profit margin improved from 12% in Q1 2023 to 14% in Q4 2023, representing a 2 percentage point increase.",
+      "data_type": "time_series",
+      "test_id": "ts_margin_comparison"
+    },
+    {
+      "query": "What is our current shareholders' equity according to the 2023 annual report?",
+      "expected_answer": "According to the 2023 annual report, the shareholders' equity is $7,000,000.",
+      "data_type": "document",
+      "test_id": "doc_shareholders_equity"
+    },
+    {
+      "query": "How has our net cash flow changed from Q3 2023 to Q1 2024?",
+      "expected_answer": "The net cash flow increased from $110,000 in Q3 2023 to $160,000 in Q1 2024, which represents a 45.5% increase.",
+      "data_type": "time_series",
+      "test_id": "ts_cash_flow_comparison"
+    }
+  ]
+} 
