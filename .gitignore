@@ -220,3 +220,5 @@ examples/rag/compose/volumes
 
 # End of https://www.gitignore.io/api/vim,c++,cmake,python,synology
 /.idea
+
+company_financial_mas/data/db/
