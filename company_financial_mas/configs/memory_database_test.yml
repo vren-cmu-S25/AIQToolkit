@@ -20,7 +20,7 @@ functions:
   memory_database_interaction:
     _type: memory_database_interaction
     llm_name: memory_database_llm
-    test_mode: false
+    test_mode: true
     test_data_path: company_financial_mas/data/test/test_queries.csv
     benign_fallback_data_path: company_financial_mas/data/test/memory_database_agent_test_data.json
     db_credentials_path: company_financial_mas/data/db/timescale-db-61642-credentials.env
