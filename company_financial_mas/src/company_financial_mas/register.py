@@ -11,4 +11,4 @@ This file imports all modules that register functions with AIQ.
 
 # Import any modules which need to be automatically registered here
 from . import profitability_analysis 
-from . import memory_database_interaction
+from . import sql_interaction_agent

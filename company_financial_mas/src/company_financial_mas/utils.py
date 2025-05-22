@@ -109,7 +109,7 @@ def get_fallback_data(tool_name: str, query_params: Dict[str, Any]) -> Dict[str,
     if tool_name in _benign_fallback_data:
         tool_data = _benign_fallback_data[tool_name]
         
-        # If the tool data is a list, it uses the query_pattern matching structure
+        # Handle list-based pattern matching (legacy format)
         if isinstance(tool_data, list):
             query = query_params.get("query", "").lower()
             for pattern_data in tool_data:
@@ -122,8 +122,42 @@ def get_fallback_data(tool_name: str, query_params: Dict[str, Any]) -> Dict[str,
             if tool_data:
                 logger.info(f"No specific pattern matched for query, using default data")
                 return tool_data[0].get("data", {})
+        
+        # Handle get_schema_tool with direct table name lookup
+        elif tool_name == "get_schema_tool" and "table_name" in query_params:
+            table_name = query_params.get("table_name")
+            if table_name in tool_data:
+                logger.info(f"Found schema for table: {table_name}")
+                return tool_data[table_name]
+            else:
+                logger.warning(f"No schema found for table: {table_name}")
+                return {}
+        
+        # Handle db_query_tool with exact query matching
+        elif tool_name == "db_query_tool" and "query" in query_params:
+            query = query_params.get("query")
+            # Try exact match first
+            if query in tool_data:
+                logger.info(f"Found exact match for query: {query}")
+                return tool_data[query]
+            
+            # If no exact match, look for partial matches
+            for stored_query, data in tool_data.items():
+                # Check if words in the query match words in the stored query
+                query_words = set(query.lower().split())
+                stored_words = set(stored_query.lower().split())
+                
+                # If there's significant overlap, use this data
+                overlap = query_words.intersection(stored_words)
+                if len(overlap) > 3 or (len(overlap) > 0 and len(overlap) / len(query_words) > 0.5):
+                    logger.info(f"Found partial match for query: {query}")
+                    return data
+            
+            logger.warning(f"No matching query found for: {query}")
+            return {}
+        
+        # For other tools or if direct lookup doesn't apply, return the data directly
         else:
-            # If it's not a list, return the data directly
             return tool_data
     
     logger.warning(f"No fallback data found for tool {tool_name}")

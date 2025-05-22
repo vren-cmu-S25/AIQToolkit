@@ -1,0 +1,35 @@
+llms:
+  sql_agent_llm:
+    _type: nim
+    model_name: meta/llama-3.3-70b-instruct
+    temperature: 0.1
+    max_tokens: 2000
+
+functions:
+  list_tables_tool:
+    _type: company_financial_mas/list_tables_tool
+    test_mode: true
+    benign_fallback_data_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/test/sql_fallback_data.json"
+  
+  get_schema_tool:
+    _type: company_financial_mas/get_schema_tool
+    test_mode: true
+    benign_fallback_data_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/test/sql_fallback_data.json"
+  
+  db_query_tool:
+    _type: company_financial_mas/db_query_tool
+    test_mode: true
+    max_rows: 100
+    benign_fallback_data_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/test/sql_fallback_data.json"
+
+workflow:
+  _type: company_financial_mas/sql_interaction
+  tool_names:
+    - list_tables_tool
+    - get_schema_tool
+    - db_query_tool
+  llm_name: sql_agent_llm
+  test_mode: true
+  db_env_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/db/timescale-db-61642-credentials.env"
+  max_rows: 100
+  benign_fallback_data_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/test/sql_fallback_data.json" 

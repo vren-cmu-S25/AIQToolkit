@@ -1,0 +1,120 @@
+{
+  "list_tables_tool": {
+    "tables": [
+      "financial_metrics",
+      "cash_flow_metrics",
+      "annual_metrics",
+      "profit_by_quarter"
+    ]
+  },
+  "get_schema_tool": {
+    "financial_metrics": {
+      "table_name": "financial_metrics",
+      "columns": [
+        {"name": "id", "type": "integer", "constraints": "PRIMARY KEY"},
+        {"name": "date", "type": "timestamp", "constraints": "NOT NULL"},
+        {"name": "revenue", "type": "numeric", "constraints": ""},
+        {"name": "growth_rate", "type": "numeric", "constraints": ""},
+        {"name": "gross_margin", "type": "numeric", "constraints": ""},
+        {"name": "operating_margin", "type": "numeric", "constraints": ""},
+        {"name": "net_profit_margin", "type": "numeric", "constraints": ""}
+      ],
+      "is_hypertable": true,
+      "time_dimension": "date"
+    },
+    "cash_flow_metrics": {
+      "table_name": "cash_flow_metrics",
+      "columns": [
+        {"name": "id", "type": "integer", "constraints": "PRIMARY KEY"},
+        {"name": "date", "type": "timestamp", "constraints": "NOT NULL"},
+        {"name": "operating_cash_flow", "type": "numeric", "constraints": ""},
+        {"name": "investing_cash_flow", "type": "numeric", "constraints": ""},
+        {"name": "financing_cash_flow", "type": "numeric", "constraints": ""},
+        {"name": "net_cash_flow", "type": "numeric", "constraints": ""}
+      ],
+      "is_hypertable": true,
+      "time_dimension": "date"
+    },
+    "annual_metrics": {
+      "table_name": "annual_metrics",
+      "columns": [
+        {"name": "id", "type": "integer", "constraints": "PRIMARY KEY"},
+        {"name": "year", "type": "integer", "constraints": "NOT NULL"},
+        {"name": "revenue", "type": "numeric", "constraints": ""},
+        {"name": "net_income", "type": "numeric", "constraints": ""},
+        {"name": "eps", "type": "numeric", "constraints": ""},
+        {"name": "total_assets", "type": "numeric", "constraints": ""},
+        {"name": "total_liabilities", "type": "numeric", "constraints": ""},
+        {"name": "shareholders_equity", "type": "numeric", "constraints": ""},
+        {"name": "report_path", "type": "text", "constraints": ""}
+      ],
+      "is_hypertable": false
+    },
+    "profit_by_quarter": {
+      "table_name": "profit_by_quarter",
+      "columns": [
+        {"name": "quarter", "type": "timestamp", "constraints": ""},
+        {"name": "total_revenue", "type": "numeric", "constraints": ""},
+        {"name": "avg_net_profit_margin", "type": "numeric", "constraints": ""},
+        {"name": "estimated_profit", "type": "numeric", "constraints": ""}
+      ],
+      "is_view": true
+    }
+  },
+  "db_query_tool": {
+    "SELECT * FROM financial_metrics LIMIT 3": {
+      "columns": ["date", "revenue", "growth_rate", "gross_margin", "operating_margin", "net_profit_margin"],
+      "rows": [
+        {"date": "2024-01-01", "revenue": 1500000, "growth_rate": 0.05, "gross_margin": 0.65, "operating_margin": 0.25, "net_profit_margin": 0.18},
+        {"date": "2024-02-01", "revenue": 1650000, "growth_rate": 0.10, "gross_margin": 0.67, "operating_margin": 0.27, "net_profit_margin": 0.20},
+        {"date": "2024-03-01", "revenue": 1750000, "growth_rate": 0.06, "gross_margin": 0.66, "operating_margin": 0.26, "net_profit_margin": 0.19}
+      ],
+      "row_count": 3,
+      "execution_time_ms": 42
+    },
+    "SELECT * FROM cash_flow_metrics LIMIT 3": {
+      "columns": ["date", "operating_cash_flow", "investing_cash_flow", "financing_cash_flow", "net_cash_flow"],
+      "rows": [
+        {"date": "2024-01-01", "operating_cash_flow": 450000, "investing_cash_flow": -200000, "financing_cash_flow": -50000, "net_cash_flow": 200000},
+        {"date": "2024-02-01", "operating_cash_flow": 480000, "investing_cash_flow": -150000, "financing_cash_flow": -50000, "net_cash_flow": 280000},
+        {"date": "2024-03-01", "operating_cash_flow": 520000, "investing_cash_flow": -300000, "financing_cash_flow": -50000, "net_cash_flow": 170000}
+      ],
+      "row_count": 3,
+      "execution_time_ms": 38
+    },
+    "SELECT * FROM annual_metrics": {
+      "columns": ["year", "revenue", "net_income", "eps", "total_assets", "total_liabilities", "shareholders_equity"],
+      "rows": [
+        {"year": 2020, "revenue": 12000000, "net_income": 1800000, "eps": 1.80, "total_assets": 20000000, "total_liabilities": 8000000, "shareholders_equity": 12000000},
+        {"year": 2021, "revenue": 15000000, "net_income": 2250000, "eps": 2.25, "total_assets": 25000000, "total_liabilities": 10000000, "shareholders_equity": 15000000},
+        {"year": 2022, "revenue": 18000000, "net_income": 2700000, "eps": 2.70, "total_assets": 28000000, "total_liabilities": 11000000, "shareholders_equity": 17000000},
+        {"year": 2023, "revenue": 21000000, "net_income": 3150000, "eps": 3.15, "total_assets": 32000000, "total_liabilities": 12000000, "shareholders_equity": 20000000}
+      ],
+      "row_count": 4,
+      "execution_time_ms": 35
+    },
+    "SELECT * FROM profit_by_quarter": {
+      "columns": ["quarter", "total_revenue", "avg_net_profit_margin", "estimated_profit"],
+      "rows": [
+        {"quarter": "2023-Q1", "total_revenue": 4200000, "avg_net_profit_margin": 0.17, "estimated_profit": 714000},
+        {"quarter": "2023-Q2", "total_revenue": 4500000, "avg_net_profit_margin": 0.18, "estimated_profit": 810000},
+        {"quarter": "2023-Q3", "total_revenue": 4400000, "avg_net_profit_margin": 0.19, "estimated_profit": 836000},
+        {"quarter": "2023-Q4", "total_revenue": 4900000, "avg_net_profit_margin": 0.20, "estimated_profit": 980000},
+        {"quarter": "2024-Q1", "total_revenue": 5200000, "avg_net_profit_margin": 0.21, "estimated_profit": 1092000}
+      ],
+      "row_count": 5,
+      "execution_time_ms": 45
+    },
+    "SELECT year, net_income FROM annual_metrics ORDER BY year DESC LIMIT 4": {
+      "columns": ["year", "net_income"],
+      "rows": [
+        {"year": 2023, "net_income": 3150000},
+        {"year": 2022, "net_income": 2700000},
+        {"year": 2021, "net_income": 2250000},
+        {"year": 2020, "net_income": 1800000}
+      ],
+      "row_count": 4,
+      "execution_time_ms": 30
+    }
+  }
+} 
