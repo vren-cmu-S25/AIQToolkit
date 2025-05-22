@@ -44,13 +44,13 @@ class ListTablesToolConfig(FunctionBaseConfig, name="list_tables_tool"):
     description: str = Field(
         default="List all available tables in the database.",
         description="Description of the tool for the agent.")
-    test_mode: bool = Field(default=True, description="Whether to run in test mode")
+    test_mode: bool = Field(default=False, description="Whether to run in test mode")
+    connection_string: Optional[str] = Field(
+        default=None,
+        description="Database connection string")
     db_env_path: Optional[str] = Field(
         default=None,
         description="Path to the database credentials .env file")
-    connection_string: Optional[str] = Field(
-        default=None,
-        description="Database connection string (alternative to db_env_path)")
     benign_fallback_data_path: Optional[str] = Field(
         default=None, 
         description="Path to JSON file with baseline/normal system behavior data")
@@ -63,13 +63,13 @@ class GetSchemaToolConfig(FunctionBaseConfig, name="get_schema_tool"):
     description: str = Field(
         default="Get the schema information for a specific table. Args: table_name: str",
         description="Description of the tool for the agent.")
-    test_mode: bool = Field(default=True, description="Whether to run in test mode")
+    test_mode: bool = Field(default=False, description="Whether to run in test mode")
+    connection_string: Optional[str] = Field(
+        default=None,
+        description="Database connection string")
     db_env_path: Optional[str] = Field(
         default=None,
         description="Path to the database credentials .env file")
-    connection_string: Optional[str] = Field(
-        default=None,
-        description="Database connection string (alternative to db_env_path)")
     benign_fallback_data_path: Optional[str] = Field(
         default=None, 
         description="Path to JSON file with baseline/normal system behavior data")
@@ -82,13 +82,13 @@ class DBQueryToolConfig(FunctionBaseConfig, name="db_query_tool"):
     description: str = Field(
         default="Execute a SQL query and return the results. Args: query: str",
         description="Description of the tool for the agent.")
-    test_mode: bool = Field(default=True, description="Whether to run in test mode")
+    test_mode: bool = Field(default=False, description="Whether to run in test mode")
+    connection_string: Optional[str] = Field(
+        default=None,
+        description="Database connection string")
     db_env_path: Optional[str] = Field(
         default=None,
         description="Path to the database credentials .env file")
-    connection_string: Optional[str] = Field(
-        default=None,
-        description="Database connection string (alternative to db_env_path)")
     max_rows: int = Field(
         default=100,
         description="Maximum number of rows to return from a query")
@@ -106,13 +106,13 @@ class SQLInteractionConfig(FunctionBaseConfig, name="sql_interaction"):
     agent_type: str = Field(
         default="react_agent", 
         description="Type of agent to use: 'react_agent' or 'tool_calling_agent'")
-    test_mode: bool = Field(default=True, description="Whether to run in test mode")
+    test_mode: bool = Field(default=False, description="Whether to run in test mode")
     db_env_path: Optional[str] = Field(
         default=None,
         description="Path to the database credentials .env file")
     connection_string: Optional[str] = Field(
         default=None,
-        description="Database connection string (alternative to db_env_path)")
+        description="Database connection string")
     max_rows: int = Field(
         default=100,
         description="Maximum number of rows to return from a query")
@@ -141,9 +141,30 @@ class DatabaseConnection:
         self.conn = None
         
         # Load environment variables if env_file_path is provided
-        if env_file_path and os.path.exists(env_file_path):
-            load_dotenv(env_file_path)
-            self.connection_string = os.getenv("TIMESCALE_SERVICE_URL")
+        if env_file_path:
+            if os.path.exists(env_file_path):
+                load_dotenv(env_file_path)
+                
+                # First try to get a complete connection string
+                self.connection_string = os.getenv("TIMESCALE_SERVICE_URL")
+                
+                # If no connection string found, build it from individual components
+                if not self.connection_string:
+                    user = os.getenv("PGUSER")
+                    password = os.getenv("PGPASSWORD")
+                    host = os.getenv("PGHOST")
+                    port = os.getenv("PGPORT")
+                    dbname = os.getenv("PGDATABASE")
+                    sslmode = os.getenv("PGSSLMODE", "require")
+                    
+                    if user and password and host and port and dbname:
+                        self.connection_string = f"postgres://{user}:{password}@{host}:{port}/{dbname}?sslmode={sslmode}"
+                    else:
+                        utils.logger.error("Missing required database connection parameters in environment file")
+            else:
+                utils.logger.error(f"Environment file not found: {env_file_path}")
+        else:
+            utils.logger.warning("No environment file path provided")
     
     def connect(self):
         """
@@ -154,6 +175,10 @@ class DatabaseConnection:
         """
         if self.conn is None or self.conn.closed:
             try:
+                if not self.connection_string:
+                    utils.logger.error("No connection string available")
+                    raise ValueError("No database connection string available")
+                
                 self.conn = psycopg2.connect(self.connection_string, cursor_factory=RealDictCursor)
                 self.conn.autocommit = True
                 utils.logger.info("Successfully connected to the database")
@@ -185,10 +210,13 @@ class DatabaseConnection:
         conn = self.connect()
         try:
             with conn.cursor() as cur:
+                utils.logger.info(f"Executing query: {query}")
                 cur.execute(query, params)
                 if cur.description:  # Check if the query returns data
                     rows = cur.fetchmany(max_rows)
+                    utils.logger.info(f"Query returned {len(rows)} rows")
                     return pd.DataFrame(rows)
+                utils.logger.info("Query executed successfully (no result rows)")
                 return pd.DataFrame()  # Empty DataFrame for non-SELECT queries
         except Exception as e:
             utils.logger.error(f"Error executing query: {e}")
@@ -209,6 +237,7 @@ async def list_tables_tool_function(config: ListTablesToolConfig, builder: Build
     """
     # Initialize database connection
     db_conn = None
+    
     if not config.test_mode:
         db_conn = DatabaseConnection(
             connection_string=config.connection_string,
@@ -282,6 +311,7 @@ async def get_schema_tool_function(config: GetSchemaToolConfig, builder: Builder
     """
     # Initialize database connection
     db_conn = None
+    
     if not config.test_mode:
         db_conn = DatabaseConnection(
             connection_string=config.connection_string,
@@ -300,71 +330,6 @@ async def get_schema_tool_function(config: GetSchemaToolConfig, builder: Builder
         """
         utils.logger.info(f"Getting schema for table: {table_name}")
         
-        if config.test_mode:
-            mock_data = utils.get_fallback_data("get_schema_tool", {"table_name": table_name})
-            if mock_data:
-                return json.dumps(mock_data)
-            
-            # Default fallback data for testing based on the DB setup guide
-            if table_name == "financial_metrics":
-                return json.dumps({
-                    "table_name": "financial_metrics",
-                    "columns": [
-                        {"name": "id", "type": "integer", "constraints": "PRIMARY KEY"},
-                        {"name": "date", "type": "timestamp", "constraints": "NOT NULL"},
-                        {"name": "revenue", "type": "numeric", "constraints": ""},
-                        {"name": "growth_rate", "type": "numeric", "constraints": ""},
-                        {"name": "gross_margin", "type": "numeric", "constraints": ""},
-                        {"name": "operating_margin", "type": "numeric", "constraints": ""},
-                        {"name": "net_profit_margin", "type": "numeric", "constraints": ""}
-                    ],
-                    "is_hypertable": True,
-                    "time_dimension": "date"
-                })
-            elif table_name == "cash_flow_metrics":
-                return json.dumps({
-                    "table_name": "cash_flow_metrics",
-                    "columns": [
-                        {"name": "id", "type": "integer", "constraints": "PRIMARY KEY"},
-                        {"name": "date", "type": "timestamp", "constraints": "NOT NULL"},
-                        {"name": "operating_cash_flow", "type": "numeric", "constraints": ""},
-                        {"name": "investing_cash_flow", "type": "numeric", "constraints": ""},
-                        {"name": "financing_cash_flow", "type": "numeric", "constraints": ""},
-                        {"name": "net_cash_flow", "type": "numeric", "constraints": ""}
-                    ],
-                    "is_hypertable": True,
-                    "time_dimension": "date"
-                })
-            elif table_name == "annual_metrics":
-                return json.dumps({
-                    "table_name": "annual_metrics",
-                    "columns": [
-                        {"name": "id", "type": "integer", "constraints": "PRIMARY KEY"},
-                        {"name": "year", "type": "integer", "constraints": "NOT NULL"},
-                        {"name": "revenue", "type": "numeric", "constraints": ""},
-                        {"name": "net_income", "type": "numeric", "constraints": ""},
-                        {"name": "eps", "type": "numeric", "constraints": ""},
-                        {"name": "total_assets", "type": "numeric", "constraints": ""},
-                        {"name": "total_liabilities", "type": "numeric", "constraints": ""},
-                        {"name": "shareholders_equity", "type": "numeric", "constraints": ""},
-                        {"name": "report_path", "type": "text", "constraints": ""}
-                    ],
-                    "is_hypertable": False
-                })
-            elif table_name == "profit_by_quarter":
-                return json.dumps({
-                    "table_name": "profit_by_quarter",
-                    "columns": [
-                        {"name": "quarter", "type": "timestamp", "constraints": ""},
-                        {"name": "total_revenue", "type": "numeric", "constraints": ""},
-                        {"name": "avg_net_profit_margin", "type": "numeric", "constraints": ""},
-                        {"name": "estimated_profit", "type": "numeric", "constraints": ""}
-                    ],
-                    "is_view": True
-                })
-            else:
-                return json.dumps({"error": f"Table '{table_name}' not found"})
-        
         try:
             # Get column information
             column_query = """
@@ -377,7 +342,7 @@ async def get_schema_tool_function(config: GetSchemaToolConfig, builder: Builder
                 information_schema.columns
             WHERE 
                 table_schema = 'public' AND 
-                table_name = %s
+                table_name = %(table_name)s
             ORDER BY 
                 ordinal_position;
             """
@@ -395,19 +360,19 @@ async def get_schema_tool_function(config: GetSchemaToolConfig, builder: Builder
                 ON tc.constraint_name = kcu.constraint_name
             WHERE
                 tc.table_schema = 'public' AND
-                tc.table_name = %s;
+                tc.table_name = %(table_name)s;
             """
             
             # Check if it's a TimescaleDB hypertable
             hypertable_query = """
             SELECT * FROM timescaledb_information.hypertables
-            WHERE hypertable_name = %s;
+            WHERE hypertable_name = %(table_name)s;
             """
             
             # Check if it's a view
             view_query = """
             SELECT * FROM information_schema.views
-            WHERE table_schema = 'public' AND table_name = %s;
+            WHERE table_schema = 'public' AND table_name = %(table_name)s;
             """
             
             columns_df = db_conn.execute_query(column_query, {"table_name": table_name})
@@ -417,26 +382,59 @@ async def get_schema_tool_function(config: GetSchemaToolConfig, builder: Builder
             
             # Process column information with constraints
             columns = []
-            for _, col in columns_df.iterrows():
-                constraints = ""
-                if col['is_nullable'] == 'NO':
-                    constraints += "NOT NULL "
+            if not columns_df.empty:
+                for _, col in columns_df.iterrows():
+                    constraints = ""
+                    column_name = col.get('column_name', '')
+                    
+                    if column_name:
+                        if col.get('is_nullable') == 'NO':
+                            constraints += "NOT NULL "
+                        
+                        # Add any other constraints from the constraints query
+                        if not constraints_df.empty:
+                            col_constraints = constraints_df[constraints_df['column_name'] == column_name]
+                            for _, constraint in col_constraints.iterrows():
+                                if constraint.get('constraint_type') == 'PRIMARY KEY':
+                                    constraints += "PRIMARY KEY "
+                                elif constraint.get('constraint_type') == 'FOREIGN KEY':
+                                    constraints += "FOREIGN KEY "
+                                elif constraint.get('constraint_type') == 'UNIQUE':
+                                    constraints += "UNIQUE "
+                        
+                        columns.append({
+                            "name": column_name,
+                            "type": col.get('data_type', 'unknown'),
+                            "constraints": constraints.strip()
+                        })
+            
+            # If we couldn't get column info, try a simpler approach
+            if not columns:
+                simple_query = "SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = %(table_name)s;"
+                simple_df = db_conn.execute_query(simple_query, {"table_name": table_name})
                 
-                # Add any other constraints from the constraints query
-                col_constraints = constraints_df[constraints_df['column_name'] == col['column_name']]
-                for _, constraint in col_constraints.iterrows():
-                    if constraint['constraint_type'] == 'PRIMARY KEY':
-                        constraints += "PRIMARY KEY "
-                    elif constraint['constraint_type'] == 'FOREIGN KEY':
-                        constraints += "FOREIGN KEY "
-                    elif constraint['constraint_type'] == 'UNIQUE':
-                        constraints += "UNIQUE "
+                if not simple_df.empty:
+                    for _, row in simple_df.iterrows():
+                        columns.append({
+                            "name": row.get('column_name', f"column_{_}"),
+                            "type": row.get('data_type', 'unknown'),
+                            "constraints": "unknown"
+                        })
                 
-                columns.append({
-                    "name": col['column_name'],
-                    "type": col['data_type'],
-                    "constraints": constraints.strip()
-                })
+                # If still no columns, try a direct query to the table
+                if not columns:
+                    try:
+                        sample_query = f"SELECT * FROM {table_name} LIMIT 1;"
+                        sample_df = db_conn.execute_query(sample_query)
+                        if not sample_df.empty:
+                            for col_name in sample_df.columns:
+                                columns.append({
+                                    "name": col_name,
+                                    "type": "unknown",
+                                    "constraints": "unknown"
+                                })
+                    except Exception as e:
+                        utils.logger.error(f"Error getting sample data: {e}")
             
             result = {
                 "table_name": table_name,
@@ -447,12 +445,20 @@ async def get_schema_tool_function(config: GetSchemaToolConfig, builder: Builder
             
             # Add time dimension if it's a hypertable
             if not hypertable_df.empty and 'time_column_name' in hypertable_df.columns:
-                result["time_dimension"] = hypertable_df.iloc[0]['time_column_name']
+                time_col = hypertable_df.iloc[0].get('time_column_name')
+                if time_col:
+                    result["time_dimension"] = time_col
             
             return json.dumps(result)
         except Exception as e:
             utils.logger.error(f"Error getting schema for table {table_name}: {e}")
-            return json.dumps({"error": str(e)})
+            
+            # Return a basic error response with any information we have
+            return json.dumps({
+                "error": str(e),
+                "table_name": table_name,
+                "columns": []
+            })
 
     try:
         yield FunctionInfo.from_fn(
@@ -478,6 +484,7 @@ async def db_query_tool_function(config: DBQueryToolConfig, builder: Builder):
     """
     # Initialize database connection
     db_conn = None
+    
     if not config.test_mode:
         db_conn = DatabaseConnection(
             connection_string=config.connection_string,
@@ -494,7 +501,7 @@ async def db_query_tool_function(config: DBQueryToolConfig, builder: Builder):
         Returns:
             JSON string containing query results and metadata
         """
-        utils.logger.info(f"Executing query: {query}")
+        # utils.logger.info(f"Executing query: {query}")
         
         # Basic SQL validation and sanitization
         try:
@@ -518,57 +525,8 @@ async def db_query_tool_function(config: DBQueryToolConfig, builder: Builder):
             if mock_data:
                 return json.dumps(mock_data)
             
-            # Generate some mock data based on the query
-            if "financial_metrics" in query.lower():
-                return json.dumps({
-                    "columns": ["date", "revenue", "growth_rate", "gross_margin", "operating_margin", "net_profit_margin"],
-                    "rows": [
-                        {"date": "2024-01-01", "revenue": 1500000, "growth_rate": 0.05, "gross_margin": 0.65, "operating_margin": 0.25, "net_profit_margin": 0.18},
-                        {"date": "2024-02-01", "revenue": 1650000, "growth_rate": 0.10, "gross_margin": 0.67, "operating_margin": 0.27, "net_profit_margin": 0.20},
-                        {"date": "2024-03-01", "revenue": 1750000, "growth_rate": 0.06, "gross_margin": 0.66, "operating_margin": 0.26, "net_profit_margin": 0.19}
-                    ],
-                    "row_count": 3,
-                    "execution_time_ms": 42
-                })
-            elif "cash_flow_metrics" in query.lower():
-                return json.dumps({
-                    "columns": ["date", "operating_cash_flow", "investing_cash_flow", "financing_cash_flow", "net_cash_flow"],
-                    "rows": [
-                        {"date": "2024-01-01", "operating_cash_flow": 450000, "investing_cash_flow": -200000, "financing_cash_flow": -50000, "net_cash_flow": 200000},
-                        {"date": "2024-02-01", "operating_cash_flow": 480000, "investing_cash_flow": -150000, "financing_cash_flow": -50000, "net_cash_flow": 280000},
-                        {"date": "2024-03-01", "operating_cash_flow": 520000, "investing_cash_flow": -300000, "financing_cash_flow": -50000, "net_cash_flow": 170000}
-                    ],
-                    "row_count": 3,
-                    "execution_time_ms": 38
-                })
-            elif "annual_metrics" in query.lower():
-                return json.dumps({
-                    "columns": ["year", "revenue", "net_income", "eps", "total_assets", "total_liabilities", "shareholders_equity"],
-                    "rows": [
-                        {"year": 2022, "revenue": 15000000, "net_income": 2250000, "eps": 2.25, "total_assets": 25000000, "total_liabilities": 10000000, "shareholders_equity": 15000000},
-                        {"year": 2023, "revenue": 18000000, "net_income": 2700000, "eps": 2.70, "total_assets": 28000000, "total_liabilities": 11000000, "shareholders_equity": 17000000}
-                    ],
-                    "row_count": 2,
-                    "execution_time_ms": 35
-                })
-            elif "profit_by_quarter" in query.lower():
-                return json.dumps({
-                    "columns": ["quarter", "total_revenue", "avg_net_profit_margin", "estimated_profit"],
-                    "rows": [
-                        {"quarter": "2023-Q1", "total_revenue": 4200000, "avg_net_profit_margin": 0.17, "estimated_profit": 714000},
-                        {"quarter": "2023-Q2", "total_revenue": 4500000, "avg_net_profit_margin": 0.18, "estimated_profit": 810000},
-                        {"quarter": "2023-Q3", "total_revenue": 4400000, "avg_net_profit_margin": 0.19, "estimated_profit": 836000},
-                        {"quarter": "2023-Q4", "total_revenue": 4900000, "avg_net_profit_margin": 0.20, "estimated_profit": 980000}
-                    ],
-                    "row_count": 4,
-                    "execution_time_ms": 45
-                })
-            else:
-                return json.dumps({
-                    "error": "No mock data available for this query",
-                    "rows": [],
-                    "row_count": 0
-                })
+            # Default fallback data for testing
+            # ... (rest of the mock data logic)
         
         try:
             import time
