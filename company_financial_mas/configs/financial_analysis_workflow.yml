@@ -1,0 +1,111 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+general:
+  use_uvloop: true
+
+# LLM configurations
+llms:
+  # LLM for SQL interaction agent
+  sql_agent_llm:
+    _type: nim
+    model_name: meta/llama-3.3-70b-instruct
+    temperature: 0.1
+    max_tokens: 2000
+
+  # LLM for profitability analysis agent
+  profitability_analysis_llm:
+    _type: nim
+    model_name: meta/llama-3.3-70b-instruct
+    temperature: 0.2
+    max_tokens: 2048
+
+  # LLM for orchestrating workflow
+  orchestrator_llm:
+    _type: nim
+    model_name: meta/llama-3.3-70b-instruct
+    temperature: 0.1
+    max_tokens: 2048
+
+# Function configurations
+functions:
+  # SQL interaction tools (required by sql_interaction workflow)
+  list_tables_tool:
+    _type: company_financial_mas/list_tables_tool
+    test_mode: false
+    db_env_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/db/timescale-db-61642-credentials.env"
+  
+  get_schema_tool:
+    _type: company_financial_mas/get_schema_tool
+    test_mode: false
+    db_env_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/db/timescale-db-61642-credentials.env"
+  
+  db_query_tool:
+    _type: company_financial_mas/db_query_tool
+    test_mode: false
+    db_env_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/db/timescale-db-61642-credentials.env"
+    max_rows: 100
+
+  # SQL interaction agent as a function
+  sql_interaction_agent:
+    _type: company_financial_mas/sql_interaction
+    tool_names:
+      - list_tables_tool
+      - get_schema_tool
+      - db_query_tool
+    llm_name: sql_agent_llm
+    test_mode: false
+    db_env_path: "/Users/vincentren/Desktop/2025 Summer/AIQToolkit/company_financial_mas/data/db/timescale-db-61642-credentials.env"
+    max_rows: 100
+
+  # Profitability analysis agent as a function
+  profitability_analysis_agent:
+    _type: company_financial_mas/profitability_analysis
+    llm_name: profitability_analysis_llm
+    test_mode: false
+
+# Main workflow configuration using ReAct agent to orchestrate
+workflow:
+  _type: react_agent
+  tool_names:
+    - sql_interaction_agent
+    - profitability_analysis_agent
+  llm_name: orchestrator_llm
+  verbose: true
+  handle_parsing_errors: true
+  max_retries: 3
+  max_iterations: 10
+  system_prompt: |
+    You are a Financial Analysis Orchestrator that coordinates between SQL data retrieval and profitability analysis.
+    
+    Your role is to:
+    1. First, use the sql_interaction_agent to retrieve relevant financial data from the database based on the user's query
+    2. Then, use the profitability_analysis_agent to analyze the retrieved data and provide insights
+    
+    When a user asks a financial question:
+    - Start by using sql_interaction_agent to get the relevant data from the database
+    - Once you have the data, use profitability_analysis_agent to analyze it and provide insights
+    - Provide a comprehensive response that includes both the data and the analysis
+    
+    Available tools:
+    - sql_interaction_agent: Use this to retrieve financial data from the database by translating natural language questions into SQL queries
+    - profitability_analysis_agent: Use this to analyze profitability metrics and provide insights on financial performance
+    
+    Always follow this workflow:
+    1. Query → SQL Agent → Data Retrieval
+    2. Data → Profitability Agent → Analysis & Insights
+    3. Combine results into a comprehensive response
+    
+    Be thorough in your analysis and provide actionable insights based on the data retrieved. 
